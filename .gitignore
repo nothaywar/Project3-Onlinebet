@@ -1,0 +1,62 @@
+# macOS system files
+.DS_Store
+
+# Node.js dependencies
+node_modules/
+
+# Solidity compiler output
+/build/
+
+# Truffle development environment
+.truffle/
+
+# Hardhat development environment
+artifacts/
+cache/
+coverage/
+node_modules/
+reports/
+.localhost-*
+.env
+
+# Visual Studio Code settings (optional)
+.vscode/
+
+# Local configuration files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Package-lock files
+package-lock.json
+yarn.lock
+
+# Compiled contract files (if you're using Truffle)
+.json
+
+# Test coverage reports
+coverage/
+
+# Logs and debug data
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# .nyc_output directory
+.nyc_output/
+
+# Hardhat console history
+.history/
+
+# Custom build directories (if applicable)
+/build/
+/dist/
+/out/
+
+# Ignore custom configuration files (e.g., truffle-config.js, hardhat.config.js)
+# Uncomment the line relevant to your project or add more if necessary.
+# /truffle-config.js
+# /hardhat.config.js
