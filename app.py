@@ -1,10 +1,10 @@
 import streamlit as st
-from user_manager import UserManager  # Import the UserManager class from the user_manager module
+from UserManager import UserManager  # Import the UserManager class from the user_manager module
 
 st.title("User Registration and Login")
 
 # Initialize the user manager
-user_manager = UserManager('config.yaml')
+user_manager = UserManager()
 
 # Streamlit page selection
 page = st.radio("Select a Page", ["Register", "Login"])
@@ -20,3 +20,7 @@ if page == "Login":
     password = st.text_input("Password", type="password")
     if st.button("Login"):
         user_manager.login_user(username, password)
+
+# Check if the user is authenticated and redirect to the chatroom subapp
+if user_manager.is_authenticated(username):
+    st.subapp("Chatroom", chatroom, username)

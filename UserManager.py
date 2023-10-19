@@ -1,16 +1,22 @@
 import streamlit as st
 import psycopg2
 from passlib.hash import pbkdf2_sha256
-from decouple import config  # Import config from python-decouple
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 class UserManager:
     def __init__(self):
         # Read configuration from .env file
-        self.DB_NAME = config('DB_NAME')
-        self.DB_USER = config('DB_USER')
-        self.DB_PASSWORD = config('DB_PASSWORD')
-        self.DB_HOST = config('DB_HOST')
-        self.DB_PORT = config('DB_PORT')
+        self.DB_NAME = os.getenv('DB_NAME')
+        self.DB_USER = os.getenv('DB_USER')
+        self.DB_PASSWORD = os.getenv('DB_PASSWORD')
+        self.DB_HOST = os.getenv('DB_HOST')
+        self.DB_PORT = os.getenv('DB_PORT')
+       
+    def is_authenticated(self, username):
+        return st.session_state.get("authenticated_user") == username
 
     def register_user(self, username, password):
         conn = psycopg2.connect(
@@ -58,3 +64,6 @@ class UserManager:
             st.error("User not found. Please register first.")
 
         conn.close()
+        
+    def logout(self):
+        st.session_state["authenticated_user"] = None
