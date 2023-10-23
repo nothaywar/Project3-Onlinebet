@@ -14,10 +14,16 @@ class UserManager:
         self.DB_PASSWORD = os.getenv('DB_PASSWORD')
         self.DB_HOST = os.getenv('DB_HOST')
         self.DB_PORT = os.getenv('DB_PORT')
+        self.DB_NAME2 = os.getenv('DB_NAME2')
        
-    def is_authenticated(self, username):
-        return st.session_state.get("authenticated_user") == username
+    def set_authenticated(self, username, value):
+        st.session_state[username + '_authenticated'] = value
 
+    def is_authenticated(self, username):
+        if username + '_authenticated' not in st.session_state:
+            st.session_state[username + '_authenticated'] = False
+        return st.session_state[username + '_authenticated']
+    
     def register_user(self, username, password):
         conn = psycopg2.connect(
             database=self.DB_NAME,
@@ -41,7 +47,7 @@ class UserManager:
 
         conn.close()
 
-    def login_user(self, username, password):
+    def login_user(self, username, password, session_state):
         conn = psycopg2.connect(
             database=self.DB_NAME,
             user=self.DB_USER,
@@ -58,12 +64,27 @@ class UserManager:
             user_id, stored_password = user_data
             if pbkdf2_sha256.verify(password, stored_password):
                 st.success("Login successful!")
+                st.session_state.authenticated = True  # Set the user as authenticated
             else:
                 st.error("Invalid credentials. Please try again.")
         else:
             st.error("User not found. Please register first.")
 
         conn.close()
-        
+
     def logout(self):
         st.session_state["authenticated_user"] = None
+
+    # Modify this method to store chat messages in st.session_state
+    def add_chat_message(self, username, message):
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
+
+        st.session_state.messages.append({"role": username, "content": message})
+
+    # Modify this method to retrieve chat messages from st.session_state
+    def get_chat_messages(self):
+        if "messages" in st.session_state:
+            return st.session_state.messages
+        else:
+            return []
