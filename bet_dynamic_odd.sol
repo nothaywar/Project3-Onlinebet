@@ -55,4 +55,20 @@ contract Betting {
         require(payout > 0, "No winnings to claim");
         payable(msg.sender).transfer(payout);
     }
+
+    function getTotalBets() external view returns (uint256 totalBetsA, uint256 totalBetsB) {
+        return (totalBetsTeamA, totalBetsTeamB);
+    }
+
+    function getBetDetails(address bettor) external view returns (uint256 betTeamA, uint256 betTeamB) {
+        return (betsTeamA[bettor], betsTeamB[bettor]);
+    }
+
+    function getOutcome() external view returns (Outcome) {
+        return outcome;
+    }
+
+    function getAdmins() external view returns (address contractAdmin, address feeReceiver) {
+        return (admin, feeRecipient);
+    }
 }
