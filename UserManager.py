@@ -88,3 +88,22 @@ class UserManager:
             return st.session_state.messages
         else:
             return []
+        
+    def is_admin(self, username):
+        conn = psycopg2.connect(
+            database=self.DB_NAME,
+            user=self.DB_USER,
+            password=self.DB_PASSWORD,
+            host=self.DB_HOST,
+            port=self.DB_PORT
+        )
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT admin FROM users WHERE username = %s", (username,))
+        result = cursor.fetchone()
+        conn.close()
+
+        if result and result[0] is True:
+            return True
+        else:
+            return False
