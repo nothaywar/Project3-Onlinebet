@@ -1,8 +1,15 @@
 import streamlit as st
 from UserManager import UserManager  # Import the UserManager class from the user_manager module
-
+import time
 # Initialize the user manager
 user_manager = UserManager()
+
+if "user_data" not in st.session_state:
+    st.session_state.user_data = {
+        "team_choice": None,
+        "wallet_address": "",
+        "eth_amount": 0.0
+    }
 
 # Place the login, register, and page selection on the sidebar
 st.sidebar.title("User Authentication")
@@ -35,7 +42,7 @@ if state == "Login":
 
 # Render chat interface if user is authenticated
 if st.session_state.authenticated:
-    st.title("Chatroom")
+    st.title("💬Chatroom💬")
     st.write(f"Welcome, {username} to the chatroom!")
 
     # Chatbox to leave messages
@@ -44,7 +51,25 @@ if st.session_state.authenticated:
         user_manager.add_chat_message(username, message)
 
     # Display chat messages
-    chat_messages = user_manager.get_chat_messages()
-    for chat_message in chat_messages:
-        with st.chat_message(chat_message["role"]):
-            st.markdown(chat_message["content"])
+    with st.container():
+        chat_messages = user_manager.get_chat_messages()
+        for chat_message in chat_messages:
+            with st.chat_message(chat_message["role"]):
+                st.markdown(chat_message["content"])
+    # Check if the user is an admin and display the button to create a game
+    if user_manager.is_admin(username):
+        if st.button("Create Game"):
+            st.toast("🚨ADMIN is creating a game🚨")
+            time.sleep(3)
+            st.toast("🚨ADMIN is creating a game🚨")
+            time.sleep(3)
+    # Input fields for team choice, wallet address, and ETH amount
+            team_choice = st.radio("Choose a Team", ["Team A", "Team B"])
+            wallet_address = st.text_input("Enter Wallet Address", value=st.session_state.user_data["wallet_address"])
+            eth_amount = st.number_input("Enter ETH Amount", min_value=0.0, value=st.session_state.user_data["eth_amount"])
+
+            # Update user choices in the session state
+            if st.button("Update Choices"):
+                st.session_state.user_data["team_choice"] = team_choice
+                st.session_state.user_data["wallet_address"] = wallet_address
+                st.session_state.user_data["eth_amount"] = eth_amount
