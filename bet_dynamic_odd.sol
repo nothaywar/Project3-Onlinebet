@@ -3,13 +3,14 @@ pragma solidity ^0.8.0;
 
 contract Betting {
     address public admin;
-    address public feeRecipient; //fee collector
+    address public feeRecipient;
     enum Outcome { NotDecided, TeamA, TeamB }
     Outcome public outcome = Outcome.NotDecided;
     mapping(address => uint256) public betsTeamA;
     mapping(address => uint256) public betsTeamB;
     uint256 public totalBetsTeamA;
     uint256 public totalBetsTeamB;
+    bool public bettingOpen = true;  // Control if bet is open
 
     constructor(address _feeRecipient) {
         admin = msg.sender;
@@ -21,15 +22,21 @@ contract Betting {
         _;
     }
 
+    // Admin can open or close betting
+    function toggleBetting(bool open) external onlyAdmin {
+        bettingOpen = open;
+    }
+
     function placeBet(bool forTeamA) external payable {
-        require(outcome == Outcome.NotDecided, "Betting is closed");
+        require(bettingOpen, "Betting is closed");  // Check if the bet is close
+        require(outcome == Outcome.NotDecided, "Outcome already decided");
         require(msg.value > 0, "Bet amount must be greater than 0");
-
-        uint256 fee = msg.value / 100;  // Safe due to Solidity 0.8.0 built-in overflow checks
+        
+        uint256 fee = msg.value / 100;
         uint256 betAmount = msg.value - fee;
-
+        
         payable(feeRecipient).transfer(fee);
-
+        
         if (forTeamA) {
             betsTeamA[msg.sender] += betAmount;
             totalBetsTeamA += betAmount;
@@ -37,6 +44,12 @@ contract Betting {
             betsTeamB[msg.sender] += betAmount;
             totalBetsTeamB += betAmount;
         }
+    }
+
+    // Admin can withdraw ETH from pool
+    function withdraw(uint256 amount) external onlyAdmin {
+        require(amount <= address(this).balance, "Amount exceeds contract balance");
+        payable(admin).transfer(amount);
     }
 
     function decideOutcome(bool teamAWon) external onlyAdmin {
